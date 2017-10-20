@@ -2,9 +2,6 @@ package test;
 
 import org.apache.log4j.Logger;
 
-import com.alibaba.fastjson.JSON;
-import com.google.protobuf.MessageLite;
-
 import io.netty.channel.Channel;
 
 /**
@@ -43,7 +40,7 @@ public abstract class BaseBusinessLogicExecutor implements Runnable {
 		if (privilegeInterception()) {
 			
 		} else {
-			//像这种假设错误的业务逻辑之类的，或者错误的网络状态的，我们可以直接吧这个连接关掉
+			//像这种假设错误的业务逻辑之类的，或者错误的网络状态的，我们可以直接吧这个连接关掉，当然这样做是有风险的，可能关掉了有效的连接！
 //			channel.close();
 		}
 		

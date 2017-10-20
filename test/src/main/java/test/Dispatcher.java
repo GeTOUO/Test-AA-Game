@@ -6,11 +6,14 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
+import com.alibaba.fastjson.JSON;
 import com.angke.common.config.GlobalConfig;
 import com.angke.common.config.MsgConfig;
 import com.angke.common.constant.GlobalConfigNames;
 
 import io.netty.channel.Channel;
+import test.message.DefaultMsg;
+import test.message.JsonMsgBody;
 
 /**
  * 写一个线程池处理业务示例
@@ -33,22 +36,34 @@ public class Dispatcher {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static void submit(Channel channel, Object msg) 
+	public static void submit(Channel channel, DefaultMsg msg) 
 			throws InstantiationException, IllegalAccessException {
 		
 		//可以取出来看看我们这个消息有哪些字段，调试阶段好用
 		Field[] fields = msg.getClass().getFields();
 		
+		short msgCode = msg.getMsgCode();
+		String messageBody = msg.getMessage();
+		System.err.println(messageBody);
 		//这一步就很关键了，这里我们根据消息一个消息协议码，在系统初始化就映射好的：消息-类型-业务执行者 这个三维关系中直接反射出我们的业务执行者。
-		System.err.println(msg.getClass());
-		Class<?> executorClass = MsgConfig
-				.getExecutorClassByMsgCode(MsgConfig.getMsgCodeByMsgClass(msg.getClass()));
-		logger.info("取得执行器类型 " + executorClass);
-		BaseBusinessLogicExecutor executor =  (BaseBusinessLogicExecutor) executorClass.newInstance();
+		System.err.println(messageBody.getClass());
+		System.err.println(messageBody.toString());
+//		Class<?> executorClass = MsgConfig.getExecutorClassByMsgCode(MsgConfig.getMsgCodeByMsgClass(msg.getClass()));
+		Class<?> execClass = MsgConfig.getExecutorClassByMsgCode(msgCode);
+		logger.info("取得执行器类型 " + execClass);
+		BaseBusinessLogicExecutor executor =  (BaseBusinessLogicExecutor) execClass.newInstance();
 		logger.info("取得执行器实例 " + executor);
 		
+		
+		Class<Object> msgClassByMsgCode = MsgConfig.getMsgClassByMsgCode(msgCode);
+		System.err.println(msgClassByMsgCode + "=====================");
+		
+		Object parseObject = JSON.parseObject(messageBody, msgClassByMsgCode);
+		System.err.println(parseObject.getClass());
+		System.out.println(parseObject.toString());
+		
 		executor.setChannel(channel);
-		executor.setRequestMsg(msg);
+		executor.setRequestMsg(parseObject);
 
 		//最后提交给线程池去处理！
 		executorService.submit(executor);

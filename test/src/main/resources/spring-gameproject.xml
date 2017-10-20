@@ -12,8 +12,8 @@
     http://www.springframework.org/schema/beans/spring-beans.xsd">
 	
 	<import resource="classpath*:spring-datasource.xml"/>
-	<import resource="classpath*:spring-session-factory-mybatis.xml"/>
 	<import resource="classpath*:spring-config.xml"/>
+	<import resource="classpath*:spring-session-factory-mybatis.xml"/>
 	
 	<bean class="com.angke.game.config.ServerInit"/>
 	

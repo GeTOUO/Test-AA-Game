@@ -6,7 +6,7 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ServerInit.loadSpring("spring-config.xml");
+		ServerInit.loadSpring("spring-gameproject.xml");
 		ServerStartUp.startUp();
 	}
 
